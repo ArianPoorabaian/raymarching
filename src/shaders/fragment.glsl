@@ -54,19 +54,19 @@ float sdSphere( vec3 p, float s )
 
 
 float sdfMesh(vec3 p){
-    vec3 newP = rotate(p,vec3(1.0),uTime/3.0);
+    vec3 newP = rotate(p,vec3(1.0),uTime / 2.0);
 
     //Mouse
-    vec3 mouseDot= vec3(uMouse * uResolution.zw *2.0, 0.0);
+    vec3 mouseDot= vec3(uMouse.x * 2.0 ,uMouse.y , 0.0);
     float mouseSphere= sdSphere(p - mouseDot , 0.075);
 
-    //Box
+    //Cube
     float cube = sdBox(newP,vec3(0.2));
 
     //Sphere
     float sphere = sdSphere(newP,0.4);
 
-    //Mix
+    //Mixing cube and sphere 
     float result = mix(cube , sphere , uNumber);
     return smin(result,mouseSphere,0.5);
 }
@@ -83,13 +83,11 @@ vec3 calcNormal( in vec3 p ) // for function f(p)
 
 
 void main(){
-    float dist =  length(vUv - vec2(0.5)); //distance to center
-    vec3 backGround = mix(vec3(0.3),vec3(0.0),dist);
-    vec2 newUV=(vUv - vec2(0.5)) * uResolution.zw;
+    float distToCenter =  length(vUv - vec2(0.5)); //distance to center
+    vec3 backGround = mix(vec3(0.3),vec3(0.0),distToCenter);
+    vec2 newUV =uResolution.zw * (vUv - vec2(0.5));
     vec3 cameraPosition = vec3(0.0 , 0.0 , 2.0);
     vec3 ray = normalize(vec3 ( newUV, -1.0));
-
-    vec3 rayPosition=cameraPosition;
     
     float v = 0.0;
 
@@ -103,7 +101,6 @@ void main(){
     
     vec3 color = backGround;
     if(10.0>v){
-        color = vec3 (1.0,0.0,0.0);
         vec3 position = v*ray + cameraPosition;
         vec3 normal = calcNormal(position);
         vec2 matcapUV=getMatcap(ray,normal);
